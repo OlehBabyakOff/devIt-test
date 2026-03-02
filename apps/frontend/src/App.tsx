@@ -1,5 +1,11 @@
+import { RequestForm } from "@components/RequestForm";
+
 function App() {
-  return <></>;
+  return (
+    <>
+      <RequestForm />
+    </>
+  );
 }
 
 export default App;
