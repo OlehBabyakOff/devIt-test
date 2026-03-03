@@ -26,6 +26,12 @@ export function useRequest() {
     activeCountRef.current = 0;
     startedThisSecRef.current = 0;
 
+    intervalRef.current = setInterval(() => {
+      startedThisSecRef.current = 0;
+
+      scheduleRequest();
+    }, 1000);
+
     const scheduleRequest = () => {
       if (completedRef.current >= total) {
         clean();
@@ -47,12 +53,6 @@ export function useRequest() {
         startRequest(index);
       }
     };
-
-    intervalRef.current = setInterval(() => {
-      startedThisSecRef.current = 0;
-
-      scheduleRequest();
-    }, 1000);
 
     const startRequest = async (index: number) => {
       activeCountRef.current++;
