@@ -7,6 +7,8 @@ import { logger } from '../logger/pino.js';
 
 import { ENV } from '../../configs/env.js';
 
+import { rateLimitLua } from './lua/rateLimit.js';
+
 class RedisClient implements IRedisClient {
   private client: RedisType;
 
@@ -43,6 +45,11 @@ class RedisClient implements IRedisClient {
     this.client.on('error', (err) => logger.error('Redis error', err));
     this.client.on('close', () => logger.warn('Redis connection closed'));
     this.client.on('reconnecting', () => logger.warn('Redis reconnecting'));
+
+    this.client.defineCommand('rateLimit', {
+      numberOfKeys: 1,
+      lua: rateLimitLua,
+    });
   }
 
   async connect(): Promise<void> {
