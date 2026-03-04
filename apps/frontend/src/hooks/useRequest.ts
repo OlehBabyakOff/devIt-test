@@ -19,6 +19,7 @@ export function useRequest() {
     }
 
     setResults([]);
+    setSuccessfulResults(0);
     setIsRunning(true);
 
     queueRef.current = Array.from({ length: total }, (_, i) => i + 1);
