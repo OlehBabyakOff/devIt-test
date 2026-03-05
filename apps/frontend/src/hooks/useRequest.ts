@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { fetchIndex } from "@services/fetch-index";
 
 export function useRequest() {
-  const [results, setResults] = useState<number[]>([]);
+  const [results, setResults] = useState<{ type: string; index: number }[]>([]);
   const [successfulResults, setSuccessfulResults] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -62,10 +62,12 @@ export function useRequest() {
       try {
         const data = await fetchIndex(index);
 
-        setResults((prev) => [...prev, data]);
+        setResults((prev) => [...prev, { type: "success", index: data }]);
         setSuccessfulResults((prev) => prev + 1);
       } catch (error) {
         console.error(error);
+
+        setResults((prev) => [...prev, { type: "error", index }]);
       } finally {
         activeCountRef.current--;
         completedRef.current++;
