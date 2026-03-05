@@ -9,7 +9,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node"],
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
