@@ -14,9 +14,9 @@ export const VALIDATION_ERRORS = {
   },
 
   INVALID_ENV: {
-    statusCode: 500,
+    message: 'Environment variables validation failed',
     status: 'INVALID_ENV',
-    defaultMessage: 'Environment variables validation failed',
+    statusCode: 500,
   },
 };
 

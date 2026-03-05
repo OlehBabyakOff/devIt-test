@@ -24,7 +24,7 @@ export class ValidationError extends BaseError {
       VALIDATION_ERRORS.INVALID_ENV.statusCode,
       VALIDATION_ERRORS.INVALID_ENV.status,
       {
-        message: message || VALIDATION_ERRORS.INVALID_ENV.defaultMessage,
+        message: message || VALIDATION_ERRORS.INVALID_ENV.message,
         contextFn: this.INVALID_ENV,
       },
     );
