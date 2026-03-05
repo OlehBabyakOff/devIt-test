@@ -4,7 +4,6 @@ import type { RedisWithScripts } from '../infrastructure/redis/interfaces/redisW
 import { randomUUID } from 'crypto';
 
 import { redisClient } from '../infrastructure/redis/redisClient.js';
-import { logger } from '../infrastructure/logger/pino.js';
 
 export function rateLimit(limit: number, window: number) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -23,8 +22,6 @@ export function rateLimit(limit: number, window: number) {
 
       next();
     } catch (error) {
-      logger.error('Rate limit middleware error', error as Error);
-
       next(error);
     }
   };
