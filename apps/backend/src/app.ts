@@ -5,6 +5,8 @@ import cors from 'cors';
 
 import { requestId } from './middlewares/reqId.middleware.js';
 import { requestLogger } from './middlewares/requestLogger.middleware.js';
+import { errorHandler } from './middlewares/errorHandler.middleware.js';
+import { notFound } from './middlewares/notFound.middleware.js';
 
 import apiRouter from './routes/api.route.js';
 
@@ -28,6 +30,10 @@ export async function startApp() {
   app.use(requestLogger());
 
   app.use(apiRouter);
+
+  app.use(notFound());
+
+  app.use(errorHandler());
 
   return app;
 }
