@@ -5,10 +5,12 @@ import { randomUUID } from 'crypto';
 
 import { redisClient } from '../infrastructure/redis/redisClient.js';
 
+import { normalizeIp } from '../utils/normalizeIp.js';
+
 export function rateLimit(limit: number, window: number) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const now = Date.now();
-    const key = `rate_limit`;
+    const key = `rate_limit:${normalizeIp(req.ip)}`;
     const uuid = randomUUID();
 
     try {
