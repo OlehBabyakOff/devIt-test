@@ -8,7 +8,7 @@ import { redisClient } from '../infrastructure/redis/redisClient.js';
 export function rateLimit(limit: number, window: number) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const now = Date.now();
-    const key = `rate_limit:global`;
+    const key = `rate_limit`;
     const uuid = randomUUID();
 
     try {
