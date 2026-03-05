@@ -22,9 +22,7 @@ export function rateLimit(limit: number, window: number) {
 
       next();
     } catch (error) {
-      // Todo add logger + handle
-      console.error(error);
-      next();
+      next(error);
     }
   };
 }
