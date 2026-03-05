@@ -1,10 +1,12 @@
 import type { Request } from 'express';
 import type { Schema } from 'joi';
 
+import { ValidationError } from '../../errors/ValidationError.js';
+
 class Validator {
   async validateRequest(schema: Schema, req: Request) {
     if (!schema) {
-      throw new Error('Schema is required');
+      throw ValidationError.INVALID_PARAMS('Invalid validation schema');
     }
 
     const { body, params, query } = req;
@@ -15,16 +17,24 @@ class Validator {
       ...query,
     };
 
-    const DTO = await schema.validateAsync(data, {
-      errors: { wrap: { label: '' } },
-      convert: true,
-      stripUnknown: true,
-    });
+    try {
+      const DTO = await schema.validateAsync(data, {
+        errors: { wrap: { label: '' } },
+        convert: true,
+        stripUnknown: true,
+      });
 
-    return DTO;
+      return DTO;
+    } catch (error: any) {
+      throw ValidationError.INVALID_PARAMS(error.message);
+    }
   }
 
   validateEnv(schema: Schema, env: Object) {
+    if (!schema) {
+      throw ValidationError.INVALID_PARAMS('Invalid validation schema');
+    }
+
     const { value, error } = schema.validate(env, {
       convert: true,
       abortEarly: false,
@@ -32,7 +42,7 @@ class Validator {
     });
 
     if (error) {
-      throw new Error(`ENV validation error: ${error.message}`);
+      throw ValidationError.INVALID_ENV(error.message);
     }
 
     return value;
