@@ -43,11 +43,9 @@ function App() {
                 <li
                   key={i}
                   ref={i === results.length - 1 ? lastItemRef : null}
-                  className={
-                    "bg-blue-100 text-blue-800 px-4 py-2 rounded-lg shadow-sm break-words"
-                  }
+                  className={`${res.type === "error" ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"} px-4 py-2 rounded-lg shadow-sm break-words`}
                 >
-                  {res}
+                  {res.index}
                 </li>
               ))}
             </ul>
