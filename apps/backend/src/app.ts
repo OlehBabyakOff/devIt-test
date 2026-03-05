@@ -13,6 +13,8 @@ import { ENV } from './configs/env.js';
 export async function startApp() {
   const app = express();
 
+  app.set('trust proxy', true);
+
   app.use(requestId());
 
   app.use(helmet());
