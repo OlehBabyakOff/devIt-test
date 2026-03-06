@@ -2,8 +2,13 @@ import { useState, useRef } from "react";
 
 import { fetchIndex } from "@services/fetch-index";
 
+type Result = {
+  type: "success" | "error";
+  index: number;
+};
+
 export function useRequest() {
-  const [results, setResults] = useState<{ type: string; index: number }[]>([]);
+  const [results, setResults] = useState<Result[]>([]);
   const [successfulResults, setSuccessfulResults] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -13,7 +18,56 @@ export function useRequest() {
   const queueRef = useRef<number[]>([]);
   const intervalRef = useRef<number | null>(null);
 
-  const run = async (total: number, limit: number) => {
+  const scheduleRequest = (limit: number, total: number) => {
+    while (
+      activeCountRef.current < limit &&
+      startedThisSecRef.current < limit &&
+      queueRef.current.length
+    ) {
+      const index = queueRef.current.shift();
+
+      if (!index) {
+        break;
+      }
+
+      startRequest(index, limit, total);
+    }
+  };
+
+  const startRequest = async (index: number, limit: number, total: number) => {
+    activeCountRef.current++;
+    startedThisSecRef.current++;
+
+    try {
+      const data = await fetchIndex(index);
+
+      setResults((prev) => [...prev, { type: "success", index: data }]);
+      setSuccessfulResults((prev) => prev + 1);
+    } catch (error) {
+      console.error(error);
+
+      setResults((prev) => [...prev, { type: "error", index }]);
+    } finally {
+      activeCountRef.current--;
+      completedRef.current++;
+
+      scheduleRequest(limit, total);
+
+      if (completedRef.current >= total) {
+        clean();
+      }
+    }
+  };
+
+  const clean = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    setIsRunning(false);
+  };
+
+  const run = (total: number, limit: number) => {
     if (isRunning || limit <= 0) {
       return;
     }
@@ -30,61 +84,10 @@ export function useRequest() {
     intervalRef.current = setInterval(() => {
       startedThisSecRef.current = 0;
 
-      scheduleRequest();
+      scheduleRequest(limit, total);
     }, 1000);
 
-    const scheduleRequest = () => {
-      if (completedRef.current >= total) {
-        clean();
-
-        return;
-      }
-
-      while (
-        activeCountRef.current < limit &&
-        startedThisSecRef.current < limit &&
-        queueRef.current.length
-      ) {
-        const index = queueRef.current.shift();
-
-        if (!index) {
-          return;
-        }
-
-        startRequest(index);
-      }
-    };
-
-    const startRequest = async (index: number) => {
-      activeCountRef.current++;
-      startedThisSecRef.current++;
-
-      try {
-        const data = await fetchIndex(index);
-
-        setResults((prev) => [...prev, { type: "success", index: data }]);
-        setSuccessfulResults((prev) => prev + 1);
-      } catch (error) {
-        console.error(error);
-
-        setResults((prev) => [...prev, { type: "error", index }]);
-      } finally {
-        activeCountRef.current--;
-        completedRef.current++;
-
-        scheduleRequest();
-      }
-    };
-
-    const clean = () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-
-      setIsRunning(false);
-    };
-
-    scheduleRequest();
+    scheduleRequest(limit, total);
   };
 
   return { results, successfulResults, run, isRunning };
